@@ -49,7 +49,7 @@ RUN cd ~/opensim/opensim_build \
     && make -j8 install
 
 RUN cd ~/opensim/opensim_install/lib/python3.6/site-packages \
-    && sudo python3 ./setup.py install
+    && python3 ./setup.py install
 
 RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/opensim/opensim_install/lib' >> ~/.bashrc \
     && echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/opensim/opensim_dependencies_install/simbody/lib' >> ~/.bashrc
