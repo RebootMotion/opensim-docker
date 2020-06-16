@@ -49,6 +49,8 @@ RUN cd /opensim/opensim_build && \
 
 SHELL ["/bin/bash", "-c"]
 
+RUN tar -czvf opensim.tar.gz /opensim
+
 RUN cd /opensim/opensim_install/lib/python3.6/site-packages && \
 	python3 ./setup.py install
 
