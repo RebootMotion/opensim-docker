@@ -10,7 +10,7 @@ RUN TZ=America/New_York && \
 RUN apt-get install wget unzip g++ git cmake cmake-curses-gui \
         freeglut3-dev libxi-dev libxmu-dev liblapack-dev \
         swig openjdk-8-jdk doxygen python3-dev python3-pip \
-        python3-tk python3-lxml python3-six -y
+        python3-tk python3-lxml python3-six python3-numpy -y
 
 RUN echo 'export PATH=/opensim/opensim_install/bin:$PATH' >> ~/.bashrc && \
     echo 'export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64' >> ~/.bashrc
