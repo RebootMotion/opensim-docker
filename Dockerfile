@@ -54,7 +54,7 @@ RUN tar -czvf opensim.tar.gz /opensim
 RUN cd /opensim/opensim_install/lib/python3.6/site-packages && \
 	python3 ./setup.py install
 
-ENV LD_LIBRARY_PATH = '$LD_LIBRARY_PATH:/opensim/opensim_install/lib:/opensim/opensim_dependencies_install/simbody/lib'
+ENV LD_LIBRARY_PATH='$LD_LIBRARY_PATH:/opensim/opensim_install/lib:/opensim/opensim_dependencies_install/simbody/lib'
 
 ENV TINI_VERSION v0.16.1
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin/tini
