@@ -2,7 +2,8 @@ version: 0.2
 
 env:
   variables:
-    CONTAINER_REPOSITORY_URL: 074878770806.dkr.ecr.us-west-1.amazonaws.com/rebootmotion/opensim-docker
+    REPOSITORY_BASE: 074878770806.dkr.ecr.us-west-1.amazonaws.com
+    CONTAINER_REPOSITORY_URL: $REPOSITORY_BASE/rebootmotion/opensim-docker
     TAG_NAME: 4.2
 
 version: 0.2
@@ -11,7 +12,7 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - $(aws ecr get-login --no-include-email)
+      - aws ecr get-login-password --region us-west-1 | docker login --username AWS --password-stdin $REPOSITORY_BASE
       - docker pull $CONTAINER_REPOSITORY_URL:$TAG_NAME || true 
 
   build:
