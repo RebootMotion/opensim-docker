@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     REPOSITORY_BASE: 074878770806.dkr.ecr.us-west-1.amazonaws.com
-    CONTAINER_REPOSITORY_URL: $REPOSITORY_BASE/rebootmotion/opensim-docker
+    CONTAINER_REPOSITORY_URL: 074878770806.dkr.ecr.us-west-1.amazonaws.com/rebootmotion/opensim-docker
     TAG_NAME: 4.2
 
 version: 0.2
