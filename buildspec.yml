@@ -12,7 +12,7 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region us-west-1 | docker login --username AWS --password-stdin $REPOSITORY_BASE
+      - aws ecr get-login-password --region us-west-1 | docker login -u AWS -p $(aws ecr get-login-password --region us-west-1) $REPOSITORY_BASE
       - docker pull $CONTAINER_REPOSITORY_URL:$TAG_NAME || true 
 
   build:
