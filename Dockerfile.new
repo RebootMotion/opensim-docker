@@ -1,0 +1,50 @@
+FROM --platform=linux/amd64 ubuntu:20.04
+
+RUN apt-get update && \
+    apt-get upgrade -y
+
+RUN TZ=America/New_York && \
+	  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+	  echo $TZ > /etc/timezone
+
+RUN apt-get install -y apt-utils cmake-gui doxygen git swig openjdk-8-jdk \
+    python3-dev python3-numpy python3-scipy wget build-essential libtool \
+    autoconf gfortran unzip pkg-config gcc patch liblapack-dev libmetis-dev \
+    libspdlog-dev python3-pip
+
+RUN echo 'export PATH=/opensim/opensim_install/bin:$PATH' >> ~/.bashrc && \
+    echo 'export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64' >> ~/.bashrc
+
+RUN mkdir /opensim && \
+	  mkdir /opensim/opensim_build && \
+	  mkdir /opensim/opensim_dependencies_install && \
+	  mkdir /opensim/opensim_dependencies_build
+
+RUN wget https://github.com/opensim-org/opensim-core/archive/refs/tags/4.2.zip && \
+    unzip 4.2.zip && \
+    mv ./opensim-core-4.2 /opensim/opensim-core && \
+    rm 4.2.zip
+
+RUN cd /opensim/opensim_dependencies_build && \
+    cmake ../opensim-core/dependencies/ \
+    -DCMAKE_INSTALL_PREFIX='/opensim/opensim_dependencies_install' \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo && \
+    make -j8
+
+RUN /opensim/opensim_dependencies_build/ipopt-prefix/src/ipopt/ThirdParty/Blas/get.Blas
+
+RUN cd /opensim/opensim_build && \
+    cmake ../opensim-core \
+    -DCMAKE_INSTALL_PREFIX='/opensim/opensim_install' \
+    -DOPENSIM_DEPENDENCIES_DIR='/opensim/opensim_dependencies_install' \
+    -DBUILD_PYTHON_WRAPPING=ON && \
+    make -j8
+
+RUN cd /opensim/opensim_build && make -j8 install
+
+RUN cd /opensim/opensim_install/lib/python3.8/site-packages && \
+    pip3 install setuptools && \
+    python3 ./setup.py install
+
+RUN cd /opensim/opensim_build && \
+    ctest -j8
