@@ -84,4 +84,8 @@ RUN echo 'export PYTHONPATH=/opensim/opensim_install/sdk/Python:/opensim/sdk/Pyt
 RUN cd /opensim/opensim_build && \
     ctest -j8 --rerun-failed --output-on-failure --python_tests
 
+ENV TINI_VERSION v0.16.1
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin/tini
+RUN chmod +x /usr/bin/tini
+
 CMD [ "/bin/bash" ]
