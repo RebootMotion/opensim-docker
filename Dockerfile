@@ -1,3 +1,15 @@
+FROM python:3.9 as adolc
+# Why not use some parallel building?
+
+RUN  cd / && \
+	git clone https://github.com/coin-or/ADOL-C.git && \
+	cd ADOL-C && \
+     git checkout releases/2.7.2 && \
+	./configure && \
+	make -j8 && \
+    make install
+
+
 FROM python:3.9
 
 ENV OPENSIM_DEPENDENCIES_HOME="/opensim_dependencies_install" \
@@ -43,15 +55,15 @@ RUN apt-get update \
             libpcre3 libpcre3-dev flex bison
 RUN pip install numpy
 # install Swig from source then install
-RUN mkdir ~/swig-source && cd ~/swig-source \
-        && wget https://github.com/swig/swig/archive/refs/tags/rel-4.0.2.tar.gz \
-        && tar xzf rel-4.0.2.tar.gz \
-        && cd swig-rel-4.0.2 \
-        && sh autogen.sh \
-        && ./configure --prefix=$HOME/swig --disable-ccache \
-        && make -j8 \
-        && make install \
-        && rm -rf ~/swig-source
+RUN mkdir ~/swig-source && cd ~/swig-source && \
+        wget https://github.com/swig/swig/archive/refs/tags/rel-4.0.2.tar.gz && \
+        tar xzf rel-4.0.2.tar.gz && \
+        cd swig-rel-4.0.2 && \
+        sh autogen.sh && \
+        ./configure --prefix=$HOME/swig --disable-ccache && \
+        make -j8 && \
+        make install && \
+        rm -rf ~/swig-source
 
 # Build and install opensim-core with python bindings
 RUN mkdir opensim_build \
@@ -63,24 +75,18 @@ RUN mkdir opensim_build \
             -DPYTHON_EXECUTABLE=/usr/bin/python \
             -DPYTHON_INCLUDE_DIR=/usr/local/include/python3.9 \
             -DPYTHON_LIBRARY=/usr/local/lib/libpython3.9.so \
-            -DPYTHON_NUMPY_INCLUDE_DIR=/usr/local/lib/python3.9/dist-packages/numpy/core/include \
-        && make -j8 \
-        && make install \
-        && rm -rf ../opensim_build \
-        && rm -rf $HOME/swig
+            -DPYTHON_NUMPY_INCLUDE_DIR=/usr/local/lib/python3.9/site-packages/numpy/core/include && \
+        make -j8 && \
+        make install && \
+        rm -rf ../opensim_build && \
+        rm -rf $HOME/swig
 
-RUN  cd / && \
-	git clone https://github.com/coin-or/ADOL-C.git && \
-	cd ADOL-C && \
-	./configure && \
-	make -j8 \
-	make install
+COPY --from=adolc /root/adolc_base/lib64/ /root/adolc_base/lib64/
 
-# Set LD_LIBRARY_PATH so pyhton can load the shard libraries
+# Set LD_LIBRARY_PATH so python can load the shard libraries
 ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$OPENSIM_DEPENDENCIES_HOME/simbody/lib:$OPENSIM_INSTALL/lib:$HOME/adolc_base/lib64"
 ENV PATH=$PATH:"$OPENSIM_INSTALL/bin"
 
 # Ideally we install the module but that doesn't work now, so we set PYTHONPATH instead
-ENV PYTHONPATH="$OPENSIM_INSTALL/lib/python/site-packages"
-RUN cd "$OPENSIM_INSTALL/lib/python/site-packages" \
-   && python setup.py install
+RUN cd "$OPENSIM_INSTALL/lib/python./site-packages" && \
+     python setup.py install

@@ -1,5 +1,16 @@
-# Dockerized OpenSim (Python 3.9)
+# docker-opensim
 
-This project contains a way to install OpenSIM 4.1 in your Python 3.9 applications.
+This repository serves as a starting point for building
+our own Docker images for OpenSim.
 
-Just build the [Dockerfile](Dockerfile) and enjoy!
+## Current state
+
+The image builds correctly and when you launch a python3.8 (beware, it also has python3.6 installed
+for some reason) and type `import opensim` it works.
+
+Currently used software is:
+
+* [adolc](https://github.com/coin-or/ADOL-C) v2.7.2
+* [OpenSIM](https://github.com/opensim-org/opensim-core) v4.1
+* [Python](https://github.com/python/cpython) v3.9
+* [SWIG](https://github.com/swig/swig) v4.2
