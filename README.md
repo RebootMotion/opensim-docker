@@ -3,6 +3,8 @@
 This repository serves as a starting point for building
 our own Docker images for OpenSim.
 
+Just please use a modern Docker with Buildkit enabled!
+
 ## Current state
 
 The image builds correctly and when you launch a python3.8 (beware, it also has python3.6 installed
@@ -15,4 +17,4 @@ Currently used software is:
 | adolc     | http://github.com/coin-or/ADOL-C                 | v2.7.2  | Abandoned |
 | OpenSIM   | https://github.com/opensim-org/opensim-core      | v4.1    | Developed |
 | Python    | https://github.com/python/cpython                | v3.9    | Developed |
-| SWIG      | https://github.com/swig/swig                     | v4.2    | Abandoned |
+| SWIG      | https://github.com/swig/swig                     | v4.0.2  | Abandoned |
