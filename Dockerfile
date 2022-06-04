@@ -48,12 +48,11 @@ RUN mkdir opensim_dependencies_build \
 ENV TZ=America/Los_Angeles
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN apt-get update \
-        && DEBIAN_FRONTEND=noninteractive \
-        && apt-get --yes install \
-            software-properties-common \
-            libpcre3 libpcre3-dev flex bison
+RUN apt-get --yes install \
+      software-properties-common \
+      libpcre3 libpcre3-dev flex bison
 RUN pip install numpy
+
 # install Swig from source then install
 RUN mkdir ~/swig-source && cd ~/swig-source && \
         wget https://github.com/swig/swig/archive/refs/tags/rel-4.0.2.tar.gz && \
