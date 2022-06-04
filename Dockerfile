@@ -66,9 +66,9 @@ RUN mkdir opensim_dependencies_build \
     && rm -rf ../opensim_dependencies_build
 
 # The following sets timezone to avoid prompt for timezone when installing packages later
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-RUN pip install numpy
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime &&  \
+    echo $TZ > /etc/timezone && \
+    pip install numpy
 
 # install Swig from source then install
 COPY --from=swig /root/swig /root/swig
