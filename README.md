@@ -10,7 +10,9 @@ for some reason) and type `import opensim` it works.
 
 Currently used software is:
 
-* [adolc](https://github.com/coin-or/ADOL-C) v2.7.2
-* [OpenSIM](https://github.com/opensim-org/opensim-core) v4.1
-* [Python](https://github.com/python/cpython) v3.9
-* [SWIG](https://github.com/swig/swig) v4.2
+| Software  | Link                                             | Lastest| Status    |
+-------------------------------------------------------------------------------------
+| [adolc]   | http://github.com/coin-or/ADOL-C                 | v2.7.2 | Abandoned |
+|  [OpenSIM]| https://github.com/opensim-org/opensim-core      | v4.1   | Developed |
+| [Python]  | https://github.com/python/cpython                | v3.9   | Developed |
+| [SWIG]    | https://github.com/swig/swig v4.2                | v4.2   | Abandoned |

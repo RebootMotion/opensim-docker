@@ -88,5 +88,6 @@ ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$OPENSIM_DEPENDENCIES_HOME/simbody/lib:$OP
 ENV PATH=$PATH:"$OPENSIM_INSTALL/bin"
 
 # Ideally we install the module but that doesn't work now, so we set PYTHONPATH instead
+ADD setup.py $OPENSIM_INSTALL/lib/python./site-packages/setup.py
 RUN cd "$OPENSIM_INSTALL/lib/python./site-packages" && \
      python setup.py install
