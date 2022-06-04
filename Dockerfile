@@ -72,7 +72,7 @@ RUN mkdir opensim_build \
 RUN  cd / && \
 	git clone https://github.com/coin-or/ADOL-C.git && \
 	cd ADOL-C && \
-	bash configure.sh && \
+	./configure && \
 	make -j8 \
 	make install
 
