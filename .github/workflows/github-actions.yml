@@ -10,6 +10,6 @@ jobs:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
-      - run: aws ecr get-docker-login -u AWS -p ($cat aws ecr get-login-password) 074878770806.dkr.ecr.us-west-1.amazonaws.com
+      - run: aws ecr get-docker-login -u AWS -p $(aws ecr get-login-password) 074878770806.dkr.ecr.us-west-1.amazonaws.com
       - run: docker build -t 074878770806.dkr.ecr.us-west-1.amazonaws.com/rebootmotion/opensim-docker:python3.9 .
       - run: docker push 074878770806.dkr.ecr.us-west-1.amazonaws.com/rebootmotion/opensim-docker:python:3.9
