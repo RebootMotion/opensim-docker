@@ -1,5 +1,4 @@
-FROM python:3.9 as adolc
-# This will build in parallel thanks to BuildKit
+FROM python:3.9
 
 RUN  cd / && \
 	git clone https://github.com/coin-or/ADOL-C.git && \
@@ -9,9 +8,6 @@ RUN  cd / && \
 	make -j8 && \
     make install
 
-
-FROM python:3.9 AS swig
-# This will also build in parallel thanks to BuildKit
 
 RUN apt-get update && \
     apt-get install -y bison libbison-dev
@@ -27,8 +23,6 @@ RUN mkdir ~/swig-source && cd ~/swig-source && \
         rm -rf ~/swig-source
 
 
-FROM python:3.9
-# The core image
 
 ENV OPENSIM_DEPENDENCIES_HOME="/opensim_dependencies_install" \
     OPENSIM_INSTALL="/opensim_install" \
@@ -56,6 +50,7 @@ RUN git clone https://github.com/opensim-org/opensim-core.git \
     && git checkout 4.1 \
     && rm -rf .git
 
+# This stage complains of missing BTK (BioMechanical Toolkit), fails with Make Error 2
 RUN mkdir opensim_dependencies_build \
     && cd opensim_dependencies_build \
     && cmake ../opensim-core/dependencies/ \
@@ -65,7 +60,7 @@ RUN mkdir opensim_dependencies_build \
     && make -j8 \
     && rm -rf ../opensim_dependencies_build
 
-# The following sets timezone to avoid prompt for timezone when installing packages later
+# So I decided to skip this stage
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime &&  \
     echo $TZ > /etc/timezone && \
     pip install numpy
