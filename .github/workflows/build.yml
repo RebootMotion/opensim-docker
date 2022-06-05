@@ -1,0 +1,9 @@
+on:
+  - pull_request
+jobs:
+  build_and_showcase:
+    name: Build the image and show that OpenSIM works
+    runs-on: ubuntu-latest
+    steps:
+      - run: docker build -t rebootmotion/opensim-docker:python3.9 .
+      - run: docker run -it rebootmotion/opensim-docker:python3.9 python -c "import opensim"
