@@ -2,7 +2,7 @@ on:
   - pull_request
 jobs:
   build_and_showcase:
-    - name: Build the image and show that OpenSIM works
+      name: Build the image and show that OpenSIM works
       runs-on: ubuntu-latest
       steps:
         - action: actions/checkout@v3
