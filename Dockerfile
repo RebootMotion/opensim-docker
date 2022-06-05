@@ -70,8 +70,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime &&  \
     echo $TZ > /etc/timezone && \
     pip install numpy
 
-# install Swig from source then install
- Build and install opensim-core with python bindings
 RUN mkdir opensim_build \
         && cd opensim_build \
         && cmake ../opensim-core \
