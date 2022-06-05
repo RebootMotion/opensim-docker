@@ -1,14 +1,11 @@
 # docker-opensim
 
 This repository serves as a starting point for building
-our own Docker images for OpenSim.
+our own Docker images for OpenSim 4.1 using Python 3.9
 
-Just please use a modern Docker with Buildkit enabled!
+Just please use a modern Docker with Buildkit enabled for building!
 
 ## Current state
-
-The image builds correctly and when you launch a python3.8 (beware, it also has python3.6 installed
-for some reason) and type `import opensim` it works.
 
 Currently used software is:
 
