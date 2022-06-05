@@ -1,64 +1,94 @@
-FROM ubuntu:18.04
+FROM python:3.9 as adolc
+# This will build in parallel thanks to BuildKit
 
-RUN apt-get update --fix-missing && \
-    apt-get upgrade -y
+RUN  cd / && \
+	git clone https://github.com/coin-or/ADOL-C.git && \
+	cd ADOL-C && \
+     git checkout releases/2.7.2 && \
+	./configure && \
+	make -j8 && \
+    make install
 
-RUN TZ=America/New_York && \
-	ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-	echo $TZ > /etc/timezone
 
-RUN apt-get install wget unzip g++ git cmake cmake-curses-gui \
-        freeglut3-dev libxi-dev libxmu-dev liblapack-dev \
-        swig openjdk-8-jdk doxygen python3-dev python3-pip \
-        python3-tk python3-lxml python3-six python3-numpy -y
+FROM python:3.9 AS swig
+# This will also build in parallel thanks to BuildKit
 
-RUN echo 'export PATH=/opensim/opensim_install/bin:$PATH' >> ~/.bashrc && \
-    echo 'export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64' >> ~/.bashrc
+RUN apt-get update && \
+    apt-get install -y bison libbison-dev
 
-RUN mkdir /opensim && \
-	mkdir /opensim/opensim_build && \
-	mkdir /opensim/opensim_dependencies_install && \
-	mkdir /opensim/opensim_dependencies_build
+RUN mkdir ~/swig-source && cd ~/swig-source && \
+        wget https://github.com/swig/swig/archive/refs/tags/rel-4.0.2.tar.gz && \
+        tar xzf rel-4.0.2.tar.gz && \
+        cd swig-rel-4.0.2 && \
+        sh autogen.sh && \
+        ./configure --prefix=$HOME/swig --disable-ccache && \
+        make -j8 && \
+        make install && \
+        rm -rf ~/swig-source
 
-RUN wget https://github.com/opensim-org/opensim-core/archive/4.1.zip && \
-	unzip 4.1.zip && \
-	mv ./opensim-core-4.1 /opensim/opensim-core && \
-	rm 4.1.zip
 
-RUN cd /opensim/opensim_dependencies_build && \
-	cmake ../opensim-core/dependencies/ \
-        -DCMAKE_INSTALL_PREFIX='/opensim/opensim_dependencies_install' \
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo && \
-	make -j8
+FROM python:3.9
+# The core image
 
-RUN cd /opensim/opensim_build && \
-	cmake ../opensim-core -DCMAKE_INSTALL_PREFIX="/opensim/opensim_install" \
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-        -DOPENSIM_DEPENDENCIES_DIR="/opensim/opensim_dependencies_install" \
-        -DBUILD_PYTHON_WRAPPING=ON \
-        -DBUILD_JAVA_WRAPPING=ON \
-        -DWITH_BTK=ON && \
-	make -j8
+ENV OPENSIM_DEPENDENCIES_HOME="/opensim_dependencies_install" \
+    OPENSIM_INSTALL="/opensim_install" \
+    DEBIAN_FRONTEND=noninteractive \
+    TZ=America/Los_Angeles
 
-# TODO: figure out why two tests fail during build.
-# RUN cd /opensim/opensim_build \
-#    && ctest -j8
+# Set DEBIAN_FRONTEND to avoid interactive timezone prompt when installing
+# packages.
+RUN apt-get update && apt-get --yes --fix-missing install \
+ libtool autoconf \
+    cmake cmake-curses-gui \
+    wget \
+    pkg-config \
+    software-properties-common \
+    libpcre3 libpcre3-dev flex bison \
+    gfortran \
+    freeglut3-dev \
+    libxi-dev libxmu-dev liblapack-dev libopenblas-dev \
+    cmake cmake-curses-gui \
+    coinor-libipopt-dev libcolpack-dev
 
-RUN cd /opensim/opensim_build && \
-	make -j8 install
+# This clones latest master, we should use tags for public releases
+RUN git clone https://github.com/opensim-org/opensim-core.git \
+    && cd /opensim-core \
+    && git checkout 4.1 \
+    && rm -rf .git
 
-SHELL ["/bin/bash", "-c"]
+RUN mkdir opensim_dependencies_build \
+    && cd opensim_dependencies_build \
+    && cmake ../opensim-core/dependencies/ \
+      -LAH -DCMAKE_INSTALL_PREFIX=$OPENSIM_DEPENDENCIES_HOME -DCMAKE_BUILD_TYPE=Release \
+      -DSUPERBUILD_ezc3d=ON -DSUPERBUILD_casadi=ON -DSUPERBUILD_adolc=ON -DSUPERBUILD_ipopt=ON \
+      -DSUPERBUILD_colpack=ON \
+    && make -j8 \
+    && rm -rf ../opensim_dependencies_build
 
-RUN tar -czvf opensim.tar.gz /opensim
+# The following sets timezone to avoid prompt for timezone when installing packages later
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime &&  \
+    echo $TZ > /etc/timezone && \
+    pip install numpy
 
-RUN cd /opensim/opensim_install/lib/python3.6/site-packages && \
-	python3 ./setup.py install
+# install Swig from source then install
+ Build and install opensim-core with python bindings
+RUN mkdir opensim_build \
+        && cd opensim_build \
+        && cmake ../opensim-core \
+            -DSWIG_DIR=~/swig/share/swig -DSWIG_EXECUTABLE=~/swig/bin/swig -DBUILD_PYTHON_WRAPPING=ON \
+            -DCMAKE_INSTALL_PREFIX=$OPENSIM_INSTALL -DOPENSIM_DEPENDENCIES_DIR=$OPENSIM_DEPENDENCIES_HOME \
+            -DBUILD_TESTING=OFF -DPYTHON_EXECUTABLE=/usr/local/bin/python \
+            -DPYTHON_INCLUDE_DIR=/usr/local/include/python3.9 \
+            -DPYTHON_LIBRARY=/usr/local/lib/libpython3.9.so && \
+        make -j8 && \
+        make install && \
+        rm -rf ../opensim_build && \
+        rm -rf $HOME/swig
 
-ENV LD_LIBRARY_PATH='$LD_LIBRARY_PATH:/opensim/opensim_install/lib:/opensim/opensim_dependencies_install/simbody/lib'
+# Set LD_LIBRARY_PATH so python can load the shard libraries
+ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$OPENSIM_DEPENDENCIES_HOME/simbody/lib:$OPENSIM_INSTALL/lib:$HOME/adolc_base/lib64" \
+    PATH=$PATH:"$OPENSIM_INSTALL/bin"
 
-ENV TINI_VERSION v0.16.1
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin/tini
-RUN chmod +x /usr/bin/tini
-
-ENTRYPOINT [ "/usr/bin/tini", "--" ]
-CMD [ "/bin/bash" ]
+ADD setup.py $OPENSIM_INSTALL/lib/python./site-packages/setup.py
+RUN cd "$OPENSIM_INSTALL/lib/python./site-packages" && \
+     python setup.py install
