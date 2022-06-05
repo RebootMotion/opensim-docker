@@ -10,7 +10,7 @@ Just please use a modern Docker with Buildkit enabled for building!
 Currently used software is:
 
 | Software  | Link                                             | Version | Status    |
---------------------------------------------------------------------------------------
+|-----------|--------------------------------------------------|---------|-----------|
 | adolc     | http://github.com/coin-or/ADOL-C                 | v2.7.2  | Abandoned |
 | OpenSIM   | https://github.com/opensim-org/opensim-core      | v4.1    | Developed |
 | Python    | https://github.com/python/cpython                | v3.9    | Developed |
