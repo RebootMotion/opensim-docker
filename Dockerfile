@@ -1,4 +1,5 @@
 FROM python:3.9
+ENV LD_LIBRARY_PATH='$LD_LIBRARY_PATH:/opensim/opensim_install/lib:/opensim/opensim_dependencies_install/simbody/lib'
 
 RUN  cd / && \
 	git clone https://github.com/coin-or/ADOL-C.git && \
