@@ -79,11 +79,9 @@ RUN mkdir opensim_build \
         && cmake ../opensim-core \
             -DSWIG_DIR=~/swig/share/swig -DSWIG_EXECUTABLE=~/swig/bin/swig -DBUILD_PYTHON_WRAPPING=ON \
             -DCMAKE_INSTALL_PREFIX=$OPENSIM_INSTALL -DOPENSIM_DEPENDENCIES_DIR=$OPENSIM_DEPENDENCIES_HOME \
-            -DOPENSIM_C3D_PARSER=ezc3d -DBUILD_TESTING=OFF -DSWIG_DOXYGEN=OFF \
-            -DPYTHON_EXECUTABLE=/usr/bin/python \
+            -DBUILD_TESTING=OFF -DPYTHON_EXECUTABLE=/usr/bin/python \
             -DPYTHON_INCLUDE_DIR=/usr/local/include/python3.9 \
-            -DPYTHON_LIBRARY=/usr/local/lib/libpython3.9.so \
-            -DPYTHON_NUMPY_INCLUDE_DIR=/usr/local/lib/python3.9/site-packages/numpy/core/include && \
+            -DPYTHON_LIBRARY=/usr/local/lib/libpython3.9.so && \
         make -j8 && \
         make install && \
         rm -rf ../opensim_build && \

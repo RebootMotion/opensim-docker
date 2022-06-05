@@ -7,4 +7,4 @@ jobs:
       steps:
         - uses: actions/checkout@v3
         - run: docker build -t rebootmotion/opensim-docker:python3.9 .
-        - run: docker run -it rebootmotion/opensim-docker:python3.9 python -c "import opensim"
+        - run: docker run -i rebootmotion/opensim-docker:python3.9 python -c "import opensim"
