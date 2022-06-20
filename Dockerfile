@@ -67,9 +67,6 @@ RUN mkdir opensim_dependencies_build \
     && rm -rf ../opensim_dependencies_build
 
 # The following sets timezone to avoid prompt for timezone when installing packages later
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime &&  \
-    echo $TZ > /etc/timezone && \
-    pip install numpy
 
 # install Swig from source then install
 COPY --from=swig /root/swig /root/swig
@@ -94,6 +91,12 @@ COPY --from=adolc /root/adolc_base/lib64/ /root/adolc_base/lib64/
 # Set LD_LIBRARY_PATH so python can load the shard libraries
 ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$OPENSIM_DEPENDENCIES_HOME/simbody/lib:$OPENSIM_INSTALL/lib:$HOME/adolc_base/lib64" \
     PATH=$PATH:"$OPENSIM_INSTALL/bin"
+
+RUN pip install numpy
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime &&  \
+    echo $TZ > /etc/timezone
+
 
 ADD setup.py $OPENSIM_INSTALL/lib/python./site-packages/setup.py
 RUN cd "$OPENSIM_INSTALL/lib/python./site-packages" && \
