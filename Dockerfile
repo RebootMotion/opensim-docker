@@ -48,7 +48,8 @@ RUN apt-get update && apt-get --yes --fix-missing install \
     freeglut3-dev \
     libxi-dev libxmu-dev liblapack-dev libopenblas-dev \
     cmake cmake-curses-gui \
-    coinor-libipopt-dev libcolpack-dev
+    coinor-libipopt-dev libcolpack-dev && \
+    apt-get clean
 
 # This clones latest master, we should use tags for public releases
 RUN git clone https://github.com/opensim-org/opensim-core.git \
